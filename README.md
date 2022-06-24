@@ -2,7 +2,7 @@ bardiademon
 <h1 align="center">
     <img width="200px" src="https://bardiademon.com/public/github/whatsappsender-java-screenshot/whatsapp-icon.svg" alt="whatsapp-sender"/>
     <br/>
-    Whatsapp Sender GUI
+    Whatsapp PDF Sender GUI
 </h1>
 
 <div align="center">
