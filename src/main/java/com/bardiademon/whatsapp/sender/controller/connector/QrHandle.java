@@ -1,4 +1,4 @@
-package com.bardiademon.whatsapp.sender.connector;
+package com.bardiademon.whatsapp.sender.controller.connector;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;

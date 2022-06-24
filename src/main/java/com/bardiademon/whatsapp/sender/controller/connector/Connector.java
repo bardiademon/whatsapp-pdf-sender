@@ -1,4 +1,4 @@
-package com.bardiademon.whatsapp.sender.connector;
+package com.bardiademon.whatsapp.sender.controller.connector;
 
 import it.auties.whatsapp.api.QrHandler;
 import it.auties.whatsapp.api.Whatsapp;
