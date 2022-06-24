@@ -7,6 +7,8 @@ import com.bardiademon.whatsapp.sender.model.Message;
 import com.bardiademon.whatsapp.sender.model.Message.Media;
 import com.bardiademon.whatsapp.sender.model.PhoneNumberImport;
 import com.bardiademon.whatsapp.sender.view.Home;
+import it.auties.whatsapp.model.info.ContextInfo;
+import it.auties.whatsapp.model.message.model.MediaMessageType;
 import it.auties.whatsapp.model.message.standard.DocumentMessage;
 import it.auties.whatsapp.model.message.standard.TextMessage;
 import org.apache.commons.io.FilenameUtils;
@@ -26,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -185,52 +186,52 @@ public class HomeController extends Home implements ConnectorStatus
     @Override
     protected void onClickBtnSendPdf()
     {
-        if (sendingListMessage)
+        if (!connector.isConnected()) setStatus("Not connected!");
+        else if (sendingListMessage) setStatus("Sending message is running...");
+        else
         {
-            setStatus("Sending message is running...");
-            return;
-        }
-        new Thread(() ->
-        {
-            try
+            new Thread(() ->
             {
-                if (phoneNumberImports == null || phoneNumberImports.size() == 0)
+                try
                 {
-                    setStatus("Phones is empty!");
-                    return;
-                }
-
-                sendingListMessage = true;
-                for (PhoneNumberImport phoneNumberImport : phoneNumberImports)
-                {
-                    if (cancelImportNumber) break;
-
-                    message.setPhone(phoneNumberImport.getPhone());
-                    message.setText(txtHiMessage.getText());
-                    timerSendListMessageIsRunning = true;
-                    send(HomeController.this::setTimer);
-                    while (HomeController.this.sendingMessage || HomeController.this.timerSendListMessageIsRunning)
+                    if (phoneNumberImports == null || phoneNumberImports.size() == 0)
                     {
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (InterruptedException e)
-                        {
-                            throw new RuntimeException(e);
-                        }
+                        setStatus("Phones is empty!");
+                        return;
                     }
-                    phoneNumberImport.setSend(true);
-                }
-            }
-            catch (Exception ignored)
-            {
-            }
 
-            sendingListMessage = false;
-            setStatus("Completed!");
-            stopImportNumber();
-        }).start();
+                    sendingListMessage = true;
+                    for (PhoneNumberImport phoneNumberImport : phoneNumberImports)
+                    {
+                        if (cancelImportNumber) break;
+
+                        message.setPhone(phoneNumberImport.getPhone());
+                        message.setText(txtHiMessage.getText());
+                        timerSendListMessageIsRunning = true;
+                        send(HomeController.this::setTimer);
+                        while (HomeController.this.sendingMessage || HomeController.this.timerSendListMessageIsRunning)
+                        {
+                            try
+                            {
+                                Thread.sleep(100);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        phoneNumberImport.setSend(true);
+                    }
+                }
+                catch (Exception ignored)
+                {
+                }
+
+                sendingListMessage = false;
+                setStatus("Completed!");
+                stopImportNumber();
+            }).start();
+        }
     }
 
     private void send(final CompletedMessageSend completedMessageSend)
@@ -309,6 +310,7 @@ public class HomeController extends Home implements ConnectorStatus
                 try (final InputStream inputStream = new File(media.getPath()).toURI().toURL().openStream())
                 {
                     connector.whatsapp.sendMessage(connector.getContactJid(message.getPhone()) , DocumentMessage.newDocumentMessage()
+                                    .mimeType("application/pdf")
                                     .storeId(connector.whatsapp.store().id())
                                     .fileName(FilenameUtils.getName(media.getPath()))
                                     .media(inputStream.readAllBytes()).create())
