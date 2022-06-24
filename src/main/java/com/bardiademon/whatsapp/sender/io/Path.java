@@ -11,7 +11,8 @@ public final class Path
     public static final String IMG_LOADING_NAME = "loading.gif";
 
     public static final String ROOT = System.getProperty("user.dir"),
-            DATA = get(ROOT , "data"), IMAGES = get(DATA , "images"), ICONS = get(IMAGES , "icons");
+            DATA = get(ROOT , "data"), IMAGES = get(DATA , "images"), ICONS = get(IMAGES , "icons"),
+            PATH_PDF = get(ROOT , "path_pdf.json");
 
     public static String get(Object... paths)
     {
